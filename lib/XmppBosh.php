@@ -93,7 +93,7 @@ class XmppBosh {
         $response = $this->sendInitConnection();
         $body = self::getBodyFromXml($response);
         $this->sid = $body->getAttribute('sid');
-        $mechanisms = $body->firstChild->firstChild->getElementsByTagName('mechanism');
+        $mechanisms = $body->firstChild->getElementsByTagName('mechanism');
 
         foreach ($mechanisms as $value) {
             $this->mechanisms[] = $value->nodeValue;
@@ -420,6 +420,13 @@ class XmppBosh {
      */
     private function send($xml) {
         $ch = curl_init($this->url);
+
+        // Set SSL options
+        if($this->useSSL) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        }
+
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
